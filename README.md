@@ -1,2 +1,2 @@
 # PromoInsta
-Promotion instagram bot
+Promotion instagram bot, based on InstaPy tools.
