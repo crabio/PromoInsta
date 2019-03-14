@@ -38,3 +38,15 @@ Promotion instagram bot, based on InstaPy tools.
 
 #### Аналитика продвижения.
 Расчет конверсии, времени подписки и прочей аналитики.
+
+
+
+
+
+# Functions
+
+## Set filtering posts location by list
+
+''' python
+session.set_locations(['Moscow', 'Moscow, Russia'])
+'''
