@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Main app",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/promoinsta.py",
+            "console": "integratedTerminal"
         }
     ]
 }
