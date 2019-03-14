@@ -252,6 +252,8 @@ class InstaPy:
         self.mandatory_character = []
         self.check_letters = {}
 
+        self.locations = []
+
         # use this variable to terminate the nested loops after quotient
         # reaches
         self.quotient_breach = False
@@ -1254,6 +1256,9 @@ class InstaPy:
         # those words
         self.comments_mandatory_words = comments_mandatory_words
 
+    def set_locations(self, locations):
+        self.locations = locations
+
     def set_simulation(self, enabled=True, percentage=100):
         """ Sets aside simulation parameters """
         if enabled not in [True, False]:
@@ -1326,15 +1331,16 @@ class InstaPy:
                 try:
                     inappropriate, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.logger))
+                                    link,
+                                    self.dont_like,
+                                    self.mandatory_words,
+                                    self.mandatory_language,
+                                    self.is_mandatory_character,
+                                    self.mandatory_character,
+                                    self.check_character_set,
+                                    self.ignore_if_contains,
+                                    self.locations,
+                                    self.logger))
 
                     if not inappropriate and self.delimit_liking:
                         self.liking_approved = verify_liking(self.browser,
@@ -1533,15 +1539,16 @@ class InstaPy:
                 try:
                     inappropriate, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.logger))
+                                    link,
+                                    self.dont_like,
+                                    self.mandatory_words,
+                                    self.mandatory_language,
+                                    self.is_mandatory_character,
+                                    self.mandatory_character,
+                                    self.check_character_set,
+                                    self.ignore_if_contains,
+                                    self.locations,
+                                    self.logger))
                     if not inappropriate:
                         # validate user
                         validation, details = self.validate_user_call(
@@ -1748,6 +1755,7 @@ class InstaPy:
                                    self.mandatory_character,
                                    self.check_character_set,
                                    self.ignore_if_contains,
+                                   self.locations,
                                    self.logger)
                     )
 
@@ -2023,6 +2031,7 @@ class InstaPy:
                                    self.mandatory_character,
                                    self.check_character_set,
                                    self.ignore_if_contains,
+                                   self.locations,
                                    self.logger))
 
                     if not inappropriate and self.delimit_liking:
@@ -2276,6 +2285,7 @@ class InstaPy:
                                    self.mandatory_character,
                                    self.check_character_set,
                                    self.ignore_if_contains,
+                                   self.locations,
                                    self.logger))
                     track = "post"
 
@@ -2568,6 +2578,7 @@ class InstaPy:
                                    self.mandatory_character,
                                    self.check_character_set,
                                    self.ignore_if_contains,
+                                   self.locations,
                                    self.logger))
 
                     if not inappropriate:
@@ -3646,6 +3657,7 @@ class InstaPy:
                                 self.mandatory_character,
                                 self.check_character_set,
                                 self.ignore_if_contains,
+                                self.locations,
                                 self.logger)
 
                             if not inappropriate and self.delimit_liking:
@@ -4150,6 +4162,7 @@ class InstaPy:
                                    self.mandatory_character,
                                    self.check_character_set,
                                    self.ignore_if_contains,
+                                   self.locations,
                                    self.logger)
                     )
 
@@ -4273,9 +4286,10 @@ class InstaPy:
                                    self.mandatory_character,
                                    self.check_character_set,
                                    self.ignore_if_contains,
+                                   self.locations,
                                    self.logger)
                     )
-
+                    
                     if not inappropriate:
                         # validate user
                         validation, details = self.validate_user_call(
@@ -4394,6 +4408,7 @@ class InstaPy:
                                self.mandatory_character,
                                self.check_character_set,
                                self.ignore_if_contains,
+                               self.locations,
                                self.logger))
 
                 if not inappropriate and self.delimit_liking:
@@ -4942,6 +4957,7 @@ class InstaPy:
                     self.mandatory_character,
                     self.check_character_set,
                     self.ignore_if_contains,
+                    self.locations,
                     self.logger)
 
                 if inappropriate:
@@ -5278,6 +5294,7 @@ class InstaPy:
                                 self.mandatory_character,
                                 self.check_character_set,
                                 self.ignore_if_contains,
+                                self.locations,
                                 self.logger))
 
                 if user_name != self.username:

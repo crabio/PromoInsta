@@ -486,6 +486,7 @@ def get_media_edge_comment_string(media):
 def check_link(browser, post_link, dont_like, mandatory_words,
                mandatory_language, mandatory_character,
                is_mandatory_character, check_character_set, ignore_if_contains,
+               locations_list,
                logger):
     """
     Check the given link if it is appropriate
@@ -616,6 +617,12 @@ def check_link(browser, post_link, dont_like, mandatory_words,
     if location_name:
         logger.info('Location: {}'.format(location_name.encode('utf-8')))
         image_text = image_text + '\n' + location_name
+        
+        """ Check if locations list is set and if location in list. Else return pass link """
+        if locations_list != []:
+            if not any((location.lower() in location_name.lower() for location in locations_list)):
+                logger.info('Location: {} not in list {}'.format(location_name.encode('utf-8'), locations_list))
+                return True, user_name, is_video, 'Location not in list', "Not needed location"
 
     if mandatory_words:
         if not any((word in image_text for word in mandatory_words)):

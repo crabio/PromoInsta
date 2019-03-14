@@ -14,16 +14,17 @@ session = InstaPy(username=insta_username,
 
 with smart_run(session):
     # Выставляем границы для пользователей
-    session.set_relationship_bounds(enabled=True,
-                                    potency_ratio=None,
-                                    delimit_by_numbers=True,
-                                    max_followers=6000,
-                                    max_following=3000,
-                                    min_followers=30,
-                                    min_following=30)
-    session.set_user_interact(amount=2, randomize=True, percentage=30,
-                              media='Photo')
+    # session.set_relationship_bounds(enabled=True,
+    #                                 potency_ratio=None,
+    #                                 delimit_by_numbers=True,
+    #                                 max_followers=6000,
+    #                                 max_following=3000,
+    #                                 min_followers=30,
+    #                                 min_following=30)
+    # session.set_user_interact(amount=2, randomize=True, percentage=30,
+    #                           media='Photo')
     session.set_do_like(enabled=True, percentage=100)
+    session.set_locations(['Moscow', 'Moscow, Russia'])
     # session.set_do_comment(enabled=True, percentage=5)
     # session.set_comments(
     #     ['Nice shot! @{}', 'I love your profile! @{}', '@{} Love it!',
@@ -40,4 +41,4 @@ with smart_run(session):
     # session.follow_user_followers(['chrisburkard', 'danielkordan'],
     #                               amount=ammount_number, randomize=False,
     #                               interact=True, sleep_delay=240)
-    session.follow_by_tags(['tag1', 'tag2'], amount=10),
+    session.follow_by_tags(['Moscow'], amount=10),
