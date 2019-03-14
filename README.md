@@ -46,7 +46,10 @@ Promotion instagram bot, based on InstaPy tools.
 # Functions
 
 ## Set filtering posts location by list
+Set locations list for filtering
 
-''' python
+```python
 session.set_locations(['Moscow', 'Moscow, Russia'])
-'''
+```
+
+Inside function check_link each post checks if location (if exist) in list, else post ignored
