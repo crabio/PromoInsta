@@ -9,7 +9,7 @@ insta_tags = ['']
 # get a session!
 session = InstaPy(username=insta_username,
                   password=insta_password,
-                  headless_browser=True,
+                  headless_browser=False,
                   multi_logs=True)
 
 with smart_run(session):
