@@ -13,6 +13,14 @@ session = InstaPy(username=insta_username,
                   multi_logs=True)
 
 with smart_run(session):
+    # Stage 2 - work with competitor followers
+    # session.set_do_like(enabled=True, percentage=100)
+    # session.set_locations(['Moscow', 'Moscow, Russia'])
+    session.set_locations([])
+    users_list = session.get_users_by_tags(['tatoo'], amount=10)
+
+    print(users_list)
+    
     # Выставляем границы для пользователей
     # session.set_relationship_bounds(enabled=True,
     #                                 potency_ratio=None,
@@ -23,8 +31,7 @@ with smart_run(session):
     #                                 min_following=30)
     # session.set_user_interact(amount=2, randomize=True, percentage=30,
     #                           media='Photo')
-    session.set_do_like(enabled=True, percentage=100)
-    session.set_locations(['Moscow', 'Moscow, Russia'])
+    
     # session.set_do_comment(enabled=True, percentage=5)
     # session.set_comments(
     #     ['Nice shot! @{}', 'I love your profile! @{}', '@{} Love it!',
@@ -37,8 +44,10 @@ with smart_run(session):
     #                        unfollow_after=42 * 60 * 60, sleep_delay=300)
 
     # follow activity
-    ammount_number = 500
+    # ammount_number = 500
     # session.follow_user_followers(['chrisburkard', 'danielkordan'],
     #                               amount=ammount_number, randomize=False,
     #                               interact=True, sleep_delay=240)
-    session.follow_by_tags(['Moscow'], amount=10),
+    
+
+    # session.follow_by_tags(['Moscow'], amount=10)
