@@ -17,9 +17,9 @@ with smart_run(session):
     # session.set_do_like(enabled=True, percentage=100)
     # session.set_locations(['Moscow', 'Moscow, Russia'])
     session.set_locations([])
-    users_list = session.get_users_by_tags(['tatoo'], amount=10)
+    session.get_competitor_users_by_tags(['tatoo'], amount=10)
 
-    print(users_list)
+    print(session.competitor_users, session.competitor_users_count)
     
     # Выставляем границы для пользователей
     # session.set_relationship_bounds(enabled=True,

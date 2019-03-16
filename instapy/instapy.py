@@ -179,6 +179,7 @@ class InstaPy:
         self.not_valid_users = 0
         self.video_played = 0
         self.already_Visited = 0
+        self.competitor_users_count = 0
 
         self.follow_times = 1
         self.share_times = 1
@@ -197,6 +198,7 @@ class InstaPy:
         self.mandatory_words = []
         self.ignore_if_contains = []
         self.ignore_users = []
+        self.competitor_users = []
 
         self.user_interact_amount = 0
         self.user_interact_media = None
@@ -4214,8 +4216,8 @@ class InstaPy:
 
         return self
 
-    # Get users list by posts tags
-    def get_users_by_tags(self,
+    # Get competitor users list by posts tags and save to session
+    def get_competitor_users_by_tags(self,
                        tags=None,
                        amount=50,
                        skip_top_posts=True,
@@ -4226,10 +4228,11 @@ class InstaPy:
             return self
 
         inap_img = 0
-        followed = 0
+        competitor_users_count = 0
         not_valid_users = 0
 
-        users_list = []
+        # Reset competitors users list before start
+        self.competitor_users = []
 
         # deletes white spaces in tags
         tags = [tag.strip() for tag in tags]
@@ -4285,7 +4288,8 @@ class InstaPy:
                             continue
                         else:
                             # Add username to list
-                            users_list.append(user_name)
+                            competitor_users_count += 1
+                            self.competitor_users.append(user_name)
                             self.logger.info('--> User {} added into list'.format(user_name))
                     else:
                         self.logger.info('--> User not added into list: {}'.format(reason))
@@ -4294,14 +4298,15 @@ class InstaPy:
                 except NoSuchElementException as err:
                     self.logger.error('Invalid Page: {}'.format(err))
 
-        self.logger.info('Added: {}'.format(followed))
+        self.logger.info('Competitor users count: {}'.format(competitor_users_count))
         self.logger.info('Inappropriate: {}'.format(inap_img))
         self.logger.info('Not valid users: {}\n'.format(not_valid_users))
 
+        self.competitor_users_count += competitor_users_count
         self.inap_img += inap_img
         self.not_valid_users += not_valid_users
 
-        return self, users_list
+        return self
 
     def follow_by_tags(self,
                        tags=None,
@@ -4759,6 +4764,7 @@ class InstaPy:
 
         stats = [self.liked_img, self.already_liked,
                  self.commented,
+                 self.competitor_users_count,
                  self.followed, self.already_followed,
                  self.unfollowed,
                  self.inap_img,
@@ -4788,6 +4794,7 @@ class InstaPy:
                 "Sessional Live Report:\n"
                 "\t|> LIKED {} images  |  ALREADY LIKED: {}\n"
                 "\t|> COMMENTED on {} images\n"
+                "\t|> FOUND {} competitor users\n"
                 "\t|> FOLLOWED {} users  |  ALREADY FOLLOWED: {}\n"
                 "\t|> UNFOLLOWED {} users\n"
                 "\t|> LIKED {} comments\n"
@@ -4798,6 +4805,7 @@ class InstaPy:
                 .format(self.liked_img,
                         self.already_liked,
                         self.commented,
+                        self.competitor_users_count,
                         self.followed,
                         self.already_followed,
                         self.unfollowed,
