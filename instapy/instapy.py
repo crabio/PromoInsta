@@ -4229,6 +4229,8 @@ class InstaPy:
         followed = 0
         not_valid_users = 0
 
+        users_list = []
+
         # deletes white spaces in tags
         tags = [tag.strip() for tag in tags]
         tags = tags or []
@@ -4275,69 +4277,31 @@ class InstaPy:
                     
                     # Approved
                     if approved:
-                        # validate user
-                        validation, details = self.validate_user_call(
-                            user_name)
+                        # validate user by avoid config
+                        validation, details = self.validate_user_call(user_name)
                         if validation is not True:
                             self.logger.info(details)
                             not_valid_users += 1
                             continue
                         else:
-                            web_address_navigator(self.browser, link)
-
-                        # try to follow
-                        follow_state, msg = follow_user(self.browser,
-                                                        "post",
-                                                        self.username,
-                                                        user_name,
-                                                        None,
-                                                        self.blacklist,
-                                                        self.logger,
-                                                        self.logfolder)
-                        if follow_state is True:
-                            followed += 1
-                            # reset jump counter after a successful follow
-                            self.jumps["consequent"]["follows"] = 0
-
-                            # Check if interaction is expected
-                            if interact and self.do_like:
-                                do_interact = random.randint(0,100) <= \
-                                              self.user_interact_percentage
-                                # Do interactions if any
-                                if do_interact and \
-                                        self.user_interact_amount > 0:
-                                    # store the original value
-                                    original_do_follow = self.do_follow
-                                    # disable following temporarily
-                                    self.do_follow = False
-                                    self.interact_by_users(user_name,
-                                                   self.user_interact_amount,
-                                                   self.user_interact_random,
-                                                   self.user_interact_media)
-                                    # back original `self.do_follow` value
-                                    self.do_follow = original_do_follow
-                        elif msg == "jumped":
-                            # will break the loop after certain consecutive
-                            # jumps
-                            self.jumps["consequent"]["follows"] += 1
-
+                            # Add username to list
+                            users_list.append(user_name)
+                            self.logger.info('--> User {} added into list'.format(user_name))
                     else:
-                        self.logger.info(
-                            '--> User not followed: {}'.format(reason))
+                        self.logger.info('--> User not added into list: {}'.format(reason))
                         inap_img += 1
 
                 except NoSuchElementException as err:
                     self.logger.error('Invalid Page: {}'.format(err))
 
-        self.logger.info('Followed: {}'.format(followed))
+        self.logger.info('Added: {}'.format(followed))
         self.logger.info('Inappropriate: {}'.format(inap_img))
         self.logger.info('Not valid users: {}\n'.format(not_valid_users))
 
-        self.followed += followed
         self.inap_img += inap_img
         self.not_valid_users += not_valid_users
 
-        return self
+        return self, users_list
 
     def follow_by_tags(self,
                        tags=None,
