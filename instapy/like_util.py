@@ -528,7 +528,7 @@ def check_link(browser, post_link, dont_like, mandatory_words,
     if post_page is None:
         logger.warning(
             'Unavailable Page: {}'.format(post_link.encode('utf-8')))
-        return True, None, None, 'Unavailable Page', "Failure"
+        return False, None, None, 'Unavailable Page', "Failure"
 
     """Gets the description of the post's link and checks for the dont_like
     tags"""
@@ -608,7 +608,7 @@ def check_link(browser, post_link, dont_like, mandatory_words,
     text"""
     if mandatory_language:
         if not check_character_set(image_text):
-            return True, user_name, is_video, 'Mandatory language not ' \
+            return False, user_name, is_video, 'Mandatory language not ' \
                                               'fulfilled', "Not mandatory " \
                                                            "language"
 
@@ -622,18 +622,18 @@ def check_link(browser, post_link, dont_like, mandatory_words,
         if locations_list != []:
             if not any((location.lower() in location_name.lower() for location in locations_list)):
                 logger.info('Location: {} not in list {}'.format(location_name.encode('utf-8'), locations_list))
-                return True, user_name, is_video, 'Location not in list', "Not needed location"
+                return False, user_name, is_video, 'Location not in list', "Not needed location"
 
     if mandatory_words:
         if not any((word in image_text for word in mandatory_words)):
-            return True, user_name, is_video, 'Mandatory words not ' \
+            return False, user_name, is_video, 'Mandatory words not ' \
                                               'fulfilled', "Not mandatory " \
                                                            "likes"
 
     image_text_lower = [x.lower() for x in image_text]
     ignore_if_contains_lower = [x.lower() for x in ignore_if_contains]
     if any((word in image_text_lower for word in ignore_if_contains_lower)):
-        return False, user_name, is_video, 'None', "Pass"
+        return True, user_name, is_video, 'None', "Pass"
 
     dont_like_regex = []
 
@@ -668,9 +668,9 @@ def check_link(browser, post_link, dont_like, mandatory_words,
             inapp_unit = 'Inappropriate! ~ contains "{}"'.format(
                 quashed if iffy == quashed else
                 '" in "'.join([str(iffy), str(quashed)]))
-            return True, user_name, is_video, inapp_unit, "Undesired word"
+            return False, user_name, is_video, inapp_unit, "Undesired word"
 
-    return False, user_name, is_video, 'None', "Success"
+    return True, user_name, is_video, 'None', "Success"
 
 
 def like_image(browser, username, blacklist, logger, logfolder):

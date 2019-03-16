@@ -1329,7 +1329,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                     link,
                                     self.dont_like,
@@ -1342,13 +1342,13 @@ class InstaPy:
                                     self.locations,
                                     self.logger))
 
-                    if not inappropriate and self.delimit_liking:
+                    if approved and self.delimit_liking:
                         self.liking_approved = verify_liking(self.browser,
                                                              self.max_likes,
                                                              self.min_likes,
                                                              self.logger)
 
-                    if not inappropriate and self.liking_approved:
+                    if approved and self.liking_approved:
                         # validate user
                         validation, details = self.validate_user_call(
                             user_name)
@@ -1537,7 +1537,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                     link,
                                     self.dont_like,
@@ -1549,7 +1549,7 @@ class InstaPy:
                                     self.ignore_if_contains,
                                     self.locations,
                                     self.logger))
-                    if not inappropriate:
+                    if approved:
                         # validate user
                         validation, details = self.validate_user_call(
                             user_name)
@@ -1745,7 +1745,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                    link,
                                    self.dont_like,
@@ -1759,13 +1759,13 @@ class InstaPy:
                                    self.logger)
                     )
 
-                    if not inappropriate and self.delimit_liking:
+                    if approved and self.delimit_liking:
                         self.liking_approved = verify_liking(self.browser,
                                                              self.max_likes,
                                                              self.min_likes,
                                                              self.logger)
 
-                    if not inappropriate and self.liking_approved:
+                    if approved and self.liking_approved:
                         # validate user
                         validation, details = self.validate_user_call(
                             user_name)
@@ -2021,7 +2021,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                    link,
                                    self.dont_like,
@@ -2034,13 +2034,13 @@ class InstaPy:
                                    self.locations,
                                    self.logger))
 
-                    if not inappropriate and self.delimit_liking:
+                    if approved and self.delimit_liking:
                         self.liking_approved = verify_liking(self.browser,
                                                              self.max_likes,
                                                              self.min_likes,
                                                              self.logger)
 
-                    if not inappropriate and self.liking_approved:
+                    if approved and self.liking_approved:
                         like_state, msg = like_image(self.browser,
                                                      user_name,
                                                      self.blacklist,
@@ -2275,7 +2275,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                    link,
                                    self.dont_like,
@@ -2289,7 +2289,7 @@ class InstaPy:
                                    self.logger))
                     track = "post"
 
-                    if not inappropriate:
+                    if approved:
                         # after first image we roll again
                         if i > 0:
                             liking = (random.randint(0,
@@ -2568,7 +2568,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                    link,
                                    self.dont_like,
@@ -2581,7 +2581,7 @@ class InstaPy:
                                    self.locations,
                                    self.logger))
 
-                    if not inappropriate:
+                    if approved:
                         # after first image we roll again
                         if i > 0:
                             liking = (
@@ -3646,7 +3646,7 @@ class InstaPy:
                         self.logger.info(link)
 
                         try:
-                            (inappropriate, user_name,
+                            (approved, user_name,
                              is_video, reason, scope) = check_link(
                                 self.browser,
                                 link,
@@ -3660,13 +3660,13 @@ class InstaPy:
                                 self.locations,
                                 self.logger)
 
-                            if not inappropriate and self.delimit_liking:
+                            if approved and self.delimit_liking:
                                 self.liking_approved = verify_liking(
                                     self.browser,
                                     self.max_likes,
                                     self.min_likes,
                                     self.logger)
-                            if not inappropriate and self.liking_approved:
+                            if approved and self.liking_approved:
                                 # validate user
                                 validation, details = self.validate_user_call(
                                     user_name)
@@ -3800,7 +3800,7 @@ class InstaPy:
                                     # certain consecutive jumps
                                     self.jumps["consequent"]["likes"] += 1
 
-                            elif inappropriate:
+                            else:
                                 inap_img += 1
                                 self.logger.info(
                                     "--> Image not liked: {}"
@@ -4152,7 +4152,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                    link,
                                    self.dont_like,
@@ -4166,7 +4166,7 @@ class InstaPy:
                                    self.logger)
                     )
 
-                    if not inappropriate:
+                    if approved:
                         # validate user
                         validation, details = self.validate_user_call(
                             user_name)
@@ -4191,6 +4191,131 @@ class InstaPy:
                             # reset jump counter after a successful follow
                             self.jumps["consequent"]["follows"] = 0
 
+                        elif msg == "jumped":
+                            # will break the loop after certain consecutive
+                            # jumps
+                            self.jumps["consequent"]["follows"] += 1
+
+                    else:
+                        self.logger.info(
+                            '--> User not followed: {}'.format(reason))
+                        inap_img += 1
+
+                except NoSuchElementException as err:
+                    self.logger.error('Invalid Page: {}'.format(err))
+
+        self.logger.info('Followed: {}'.format(followed))
+        self.logger.info('Inappropriate: {}'.format(inap_img))
+        self.logger.info('Not valid users: {}\n'.format(not_valid_users))
+
+        self.followed += followed
+        self.inap_img += inap_img
+        self.not_valid_users += not_valid_users
+
+        return self
+
+    # Get users list by posts tags
+    def get_users_by_tags(self,
+                       tags=None,
+                       amount=50,
+                       skip_top_posts=True,
+                       randomize=False,
+                       media=None,
+                       interact=False):
+        if self.aborting:
+            return self
+
+        inap_img = 0
+        followed = 0
+        not_valid_users = 0
+
+        # deletes white spaces in tags
+        tags = [tag.strip() for tag in tags]
+        tags = tags or []
+        
+        # Iterate each tag in list
+        for index, tag in enumerate(tags):
+            # Log
+            self.logger.info('Tag [{}/{}]'.format(index + 1, len(tags)))
+            self.logger.info('--> {}'.format(tag.encode('utf-8')))
+
+            # Get list of posts links by tag
+            try:
+                links = get_links_for_tag(self.browser,
+                                          tag,
+                                          amount,
+                                          skip_top_posts,
+                                          randomize,
+                                          media,
+                                          self.logger)
+            except NoSuchElementException:
+                self.logger.info('Too few images, skipping this tag')
+                continue
+
+            # Iterate each post in list
+            for i, link in enumerate(links):
+                self.logger.info('[{}/{}]'.format(i + 1, len(links)))
+                self.logger.info(link)
+
+                try:
+                    # Check post characteristics like likes count, location and etc.
+                    approved, user_name, is_video, reason, scope = (
+                        check_link(self.browser,
+                                   link,
+                                   self.dont_like,
+                                   self.mandatory_words,
+                                   self.mandatory_language,
+                                   self.is_mandatory_character,
+                                   self.mandatory_character,
+                                   self.check_character_set,
+                                   self.ignore_if_contains,
+                                   self.locations,
+                                   self.logger)
+                    )
+                    
+                    # Approved
+                    if approved:
+                        # validate user
+                        validation, details = self.validate_user_call(
+                            user_name)
+                        if validation is not True:
+                            self.logger.info(details)
+                            not_valid_users += 1
+                            continue
+                        else:
+                            web_address_navigator(self.browser, link)
+
+                        # try to follow
+                        follow_state, msg = follow_user(self.browser,
+                                                        "post",
+                                                        self.username,
+                                                        user_name,
+                                                        None,
+                                                        self.blacklist,
+                                                        self.logger,
+                                                        self.logfolder)
+                        if follow_state is True:
+                            followed += 1
+                            # reset jump counter after a successful follow
+                            self.jumps["consequent"]["follows"] = 0
+
+                            # Check if interaction is expected
+                            if interact and self.do_like:
+                                do_interact = random.randint(0,100) <= \
+                                              self.user_interact_percentage
+                                # Do interactions if any
+                                if do_interact and \
+                                        self.user_interact_amount > 0:
+                                    # store the original value
+                                    original_do_follow = self.do_follow
+                                    # disable following temporarily
+                                    self.do_follow = False
+                                    self.interact_by_users(user_name,
+                                                   self.user_interact_amount,
+                                                   self.user_interact_random,
+                                                   self.user_interact_media)
+                                    # back original `self.do_follow` value
+                                    self.do_follow = original_do_follow
                         elif msg == "jumped":
                             # will break the loop after certain consecutive
                             # jumps
@@ -4276,7 +4401,7 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    inappropriate, user_name, is_video, reason, scope = (
+                    approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                    link,
                                    self.dont_like,
@@ -4290,7 +4415,7 @@ class InstaPy:
                                    self.logger)
                     )
                     
-                    if not inappropriate:
+                    if approved:
                         # validate user
                         validation, details = self.validate_user_call(
                             user_name)
@@ -4398,7 +4523,7 @@ class InstaPy:
             self.logger.info('--> {}'.format(url.encode('utf-8')))
 
             try:
-                inappropriate, user_name, is_video, reason, scope = (
+                approved, user_name, is_video, reason, scope = (
                     check_link(self.browser,
                                url,
                                self.dont_like,
@@ -4411,13 +4536,13 @@ class InstaPy:
                                self.locations,
                                self.logger))
 
-                if not inappropriate and self.delimit_liking:
+                if approved and self.delimit_liking:
                     self.liking_approved = verify_liking(self.browser,
                                                          self.max_likes,
                                                          self.min_likes,
                                                          self.logger)
 
-                if not inappropriate and self.liking_approved:
+                if approved and self.liking_approved:
                     # validate user
                     validation, details = self.validate_user_call(user_name)
                     if validation is not True:
@@ -4946,7 +5071,7 @@ class InstaPy:
                 highlight_print(self.username, message, "post iteration",
                                 "info", self.logger)
 
-                (inappropriate, user_name,
+                (approved, user_name,
                  is_video, reason, scope) = check_link(
                     self.browser,
                     link,
@@ -4960,7 +5085,7 @@ class InstaPy:
                     self.locations,
                     self.logger)
 
-                if inappropriate:
+                if not approved:
                     self.logger.info(
                         "--> Post not interacted. {}\n"
                         .format(reason.encode('utf-8')))
@@ -5284,7 +5409,7 @@ class InstaPy:
                 post_link = "https://www.instagram.com/p/{}".format(pod_post_id)
                 web_address_navigator(self.browser, post_link)
 
-                inappropriate, user_name, is_video, reason, scope = (
+                approved, user_name, is_video, reason, scope = (
                     check_link(self.browser,
                                 post_link,
                                 self.dont_like,
@@ -5309,7 +5434,7 @@ class InstaPy:
 
                     self.dont_include.add(user_name)
 
-                if not inappropriate and user_name != self.username:
+                if approved and user_name != self.username:
                     pods_like_percent = max(80, min(100, self.like_percentage))
                     pods_comment_percentage = max(80, min(100, self.comment_percentage))
                     liking = (random.randint(0, 100) <= pods_like_percent)
