@@ -16,7 +16,7 @@ with smart_run(session):
     # Stage 2 - work with competitor followers
     # session.set_do_like(enabled=True, percentage=100)
     # session.set_locations(['Moscow', 'Moscow, Russia'])
-    session.set_locations([])
+    session.set_location_limits('Moscow', 10)
     session.get_competitor_users_by_tags(['tatoo'], amount=10)
 
     print(session.competitor_users, session.competitor_users_count)

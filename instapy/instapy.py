@@ -254,6 +254,9 @@ class InstaPy:
         self.mandatory_character = []
         self.check_letters = {}
 
+        self.location = ''
+        self.location_max_distance = 0
+        self.location_distance_unit = 'km' # Distance units in km/miles
         self.locations = []
 
         # use this variable to terminate the nested loops after quotient
@@ -1258,8 +1261,11 @@ class InstaPy:
         # those words
         self.comments_mandatory_words = comments_mandatory_words
 
-    def set_locations(self, locations):
-        self.locations = locations
+    # Set user account location and max distance for limitation
+    def set_location_limits(self, location, max_distance, distance_unit='km'):
+        self.location = location
+        self.location_max_distance = max_distance
+        self.location_distance_unit = distance_unit
 
     def set_simulation(self, enabled=True, percentage=100):
         """ Sets aside simulation parameters """
@@ -1341,7 +1347,9 @@ class InstaPy:
                                     self.mandatory_character,
                                     self.check_character_set,
                                     self.ignore_if_contains,
-                                    self.locations,
+                                    self.location,
+                                    self.location_max_distance,
+                                    self.location_distance_unit,
                                     self.logger))
 
                     if approved and self.delimit_liking:
@@ -1549,7 +1557,9 @@ class InstaPy:
                                     self.mandatory_character,
                                     self.check_character_set,
                                     self.ignore_if_contains,
-                                    self.locations,
+                                    self.location,
+                                    self.location_max_distance,
+                                    self.location_distance_unit,
                                     self.logger))
                     if approved:
                         # validate user
@@ -1749,16 +1759,18 @@ class InstaPy:
                 try:
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.locations,
-                                   self.logger)
+                                link,
+                                self.dont_like,
+                                self.mandatory_words,
+                                self.mandatory_language,
+                                self.is_mandatory_character,
+                                self.mandatory_character,
+                                self.check_character_set,
+                                self.ignore_if_contains,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
+                                self.logger)
                     )
 
                     if approved and self.delimit_liking:
@@ -2025,16 +2037,18 @@ class InstaPy:
                 try:
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.locations,
-                                   self.logger))
+                                link,
+                                self.dont_like,
+                                self.mandatory_words,
+                                self.mandatory_language,
+                                self.is_mandatory_character,
+                                self.mandatory_character,
+                                self.check_character_set,
+                                self.ignore_if_contains,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
+                                self.logger))
 
                     if approved and self.delimit_liking:
                         self.liking_approved = verify_liking(self.browser,
@@ -2279,16 +2293,18 @@ class InstaPy:
                 try:
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.locations,
-                                   self.logger))
+                                link,
+                                self.dont_like,
+                                self.mandatory_words,
+                                self.mandatory_language,
+                                self.is_mandatory_character,
+                                self.mandatory_character,
+                                self.check_character_set,
+                                self.ignore_if_contains,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
+                                self.logger))
                     track = "post"
 
                     if approved:
@@ -2572,16 +2588,18 @@ class InstaPy:
                 try:
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.locations,
-                                   self.logger))
+                                link,
+                                self.dont_like,
+                                self.mandatory_words,
+                                self.mandatory_language,
+                                self.is_mandatory_character,
+                                self.mandatory_character,
+                                self.check_character_set,
+                                self.ignore_if_contains,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
+                                self.logger))
 
                     if approved:
                         # after first image we roll again
@@ -3659,7 +3677,9 @@ class InstaPy:
                                 self.mandatory_character,
                                 self.check_character_set,
                                 self.ignore_if_contains,
-                                self.locations,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
                                 self.logger)
 
                             if approved and self.delimit_liking:
@@ -4156,16 +4176,18 @@ class InstaPy:
                 try:
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.locations,
-                                   self.logger)
+                                link,
+                                self.dont_like,
+                                self.mandatory_words,
+                                self.mandatory_language,
+                                self.is_mandatory_character,
+                                self.mandatory_character,
+                                self.check_character_set,
+                                self.ignore_if_contains,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
+                                self.logger)
                     )
 
                     if approved:
@@ -4266,16 +4288,18 @@ class InstaPy:
                     # Check post characteristics like likes count, location and etc.
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.locations,
-                                   self.logger)
+                                link,
+                                self.dont_like,
+                                self.mandatory_words,
+                                self.mandatory_language,
+                                self.is_mandatory_character,
+                                self.mandatory_character,
+                                self.check_character_set,
+                                self.ignore_if_contains,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
+                                self.logger)
                     )
                     
                     # Approved
@@ -4372,16 +4396,18 @@ class InstaPy:
                 try:
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
-                                   link,
-                                   self.dont_like,
-                                   self.mandatory_words,
-                                   self.mandatory_language,
-                                   self.is_mandatory_character,
-                                   self.mandatory_character,
-                                   self.check_character_set,
-                                   self.ignore_if_contains,
-                                   self.locations,
-                                   self.logger)
+                                link,
+                                self.dont_like,
+                                self.mandatory_words,
+                                self.mandatory_language,
+                                self.is_mandatory_character,
+                                self.mandatory_character,
+                                self.check_character_set,
+                                self.ignore_if_contains,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
+                                self.logger)
                     )
                     
                     if approved:
@@ -4494,16 +4520,18 @@ class InstaPy:
             try:
                 approved, user_name, is_video, reason, scope = (
                     check_link(self.browser,
-                               url,
-                               self.dont_like,
-                               self.mandatory_words,
-                               self.mandatory_language,
-                               self.is_mandatory_character,
-                               self.mandatory_character,
-                               self.check_character_set,
-                               self.ignore_if_contains,
-                               self.locations,
-                               self.logger))
+                            url,
+                            self.dont_like,
+                            self.mandatory_words,
+                            self.mandatory_language,
+                            self.is_mandatory_character,
+                            self.mandatory_character,
+                            self.check_character_set,
+                            self.ignore_if_contains,
+                            self.location,
+                            self.location_max_distance,
+                            self.location_distance_unit,
+                            self.logger))
 
                 if approved and self.delimit_liking:
                     self.liking_approved = verify_liking(self.browser,
@@ -5054,7 +5082,9 @@ class InstaPy:
                     self.mandatory_character,
                     self.check_character_set,
                     self.ignore_if_contains,
-                    self.locations,
+                    self.location,
+                    self.location_max_distance,
+                    self.location_distance_unit,
                     self.logger)
 
                 if not approved:
@@ -5391,7 +5421,9 @@ class InstaPy:
                                 self.mandatory_character,
                                 self.check_character_set,
                                 self.ignore_if_contains,
-                                self.locations,
+                                self.location,
+                                self.location_max_distance,
+                                self.location_distance_unit,
                                 self.logger))
 
                 if user_name != self.username:

@@ -17,6 +17,7 @@ from .util import explicit_wait
 from .util import extract_text_from_element
 from .quota_supervisor import quota_supervisor
 from .unfollow_util import get_following_status
+from .locations_service import get_places_distance
 
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import NoSuchElementException
@@ -484,10 +485,10 @@ def get_media_edge_comment_string(media):
 
 
 def check_link(browser, post_link, dont_like, mandatory_words,
-               mandatory_language, mandatory_character,
-               is_mandatory_character, check_character_set, ignore_if_contains,
-               locations_list,
-               logger):
+            mandatory_language, mandatory_character,
+            is_mandatory_character, check_character_set, ignore_if_contains,
+            user_location, location_max_distance, location_distance_unit,
+            logger):
     """
     Check the given link if it is appropriate
 
@@ -618,11 +619,15 @@ def check_link(browser, post_link, dont_like, mandatory_words,
         logger.info('Location: {}'.format(location_name.encode('utf-8')))
         image_text = image_text + '\n' + location_name
         
-        """ Check if locations list is set and if location in list. Else return pass link """
-        if locations_list != []:
-            if not any((location.lower() in location_name.lower() for location in locations_list)):
-                logger.info('Location: {} not in list {}'.format(location_name.encode('utf-8'), locations_list))
-                return False, user_name, is_video, 'Location not in list', "Not needed location"
+        """ Check if location is in limited radius of user location"""
+        if user_location:
+            post_location_distance = get_places_distance(user_location, location_name, location_distance_unit)
+
+            if post_location_distance:
+                if post_location_distance > location_max_distance:
+                    # Distance is bigger than config radius
+                    logger.info('Location: {} has distance {} from user location. It is bigger than {}'.format(location_name.encode('utf-8'), post_location_distance, location_max_distance))
+                    return False, user_name, is_video, 'Location is so far', "Not needed location"
 
     if mandatory_words:
         if not any((word in image_text for word in mandatory_words)):
