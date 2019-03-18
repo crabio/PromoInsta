@@ -266,6 +266,71 @@ def get_comments_on_post(browser,
 
         return comment_data
 
+# Get comments and description of poster on post
+# This feature is used for tag getting
+def get_poster_comments_on_post(browser,
+                         poster,
+                         post_link,
+                         logger):
+    """ Fetch comments data on posts """
+
+    web_address_navigator(browser, post_link)
+
+    # check if commenting on the post is enabled
+    commenting_state, msg = is_commenting_enabled(browser, logger)
+    if commenting_state is not True:
+        logger.info(msg)
+        return None
+
+    # check if there are any comments in the post
+    comments_count, msg = get_comments_count(browser, logger)
+    if not comments_count:
+        logger.info(msg)
+        return None
+
+    # get comments & commenters information
+    comments_block_XPath = "//div/div/h3/../../../.."  # efficient location
+    # path
+    like_button_full_XPath = "//div/span/button/span[@aria-label='Like']"
+    unlike_button_full_XPath = "//div/span/button/span[@aria-label='Unlike']"
+
+    comments = []
+    commenters = []
+    # wait for page fully load [IMPORTANT!]
+    explicit_wait(browser, "PFL", [], logger, 10)
+
+    try:
+        comments_block = browser.find_elements_by_xpath(
+            comments_block_XPath)
+        for comment_line in comments_block:
+            # commenter_elem = comment_line.find_element_by_xpath('//h3/a')
+            commenter_elem = comment_line.find_elements_by_tag_name('a')[0]
+            commenter = extract_text_from_element(commenter_elem)
+            if (commenter and commenter == poster):
+                commenters.append(commenter)
+            else:
+                continue
+
+            comment_elem = comment_line.find_elements_by_tag_name("span")[0]
+            comment = extract_text_from_element(comment_elem)
+            if comment:
+                comments.append(comment)
+            else:
+                commenters.remove(commenters[-1])
+                continue
+
+    except NoSuchElementException:
+        logger.info("Failed to get comments on this post.")
+        return None
+
+    if not comments:
+        logger.info("Could not grab any usable comments from this post..")
+        return None
+
+    else:
+        comment_data = list(zip(commenters, comments))
+        
+        return comment_data
 
 def is_commenting_enabled(browser, logger):
     """ Find out if commenting on the post is enabled """

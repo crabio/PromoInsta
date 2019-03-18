@@ -17,12 +17,15 @@ import logging
 from contextlib import contextmanager
 from copy import deepcopy
 import unicodedata
+import re
+import textdistance
 
 # import InstaPy modules
 from .clarifai_util import check_image
 from .comment_util import comment_image
 from .comment_util import verify_commenting
 from .comment_util import get_comments_on_post
+from .comment_util import get_poster_comments_on_post
 from .like_util import check_link
 from .like_util import verify_liking
 from .like_util import get_links_for_tag
@@ -32,6 +35,7 @@ from .like_util import get_links_for_location
 from .like_util import like_image
 from .like_util import get_links_for_username
 from .like_util import like_comment
+from .like_util import get_link_description
 from .login_util import login_user
 from .settings import Settings
 from .print_log_writer import log_follower_num
@@ -5284,6 +5288,149 @@ class InstaPy:
                              .format(already_followed))
             self.logger.info("\tInappropriate posts: {}".format(inap_img))
             self.logger.info("\tNot valid users: {}".format(not_valid_users))
+
+    def get_users_posts_tags(self,
+                             usernames=None,
+                             posts_amount=10,
+                             randomize=False,
+                             media=None):
+        """
+         Like comments of people on posts, reply to them
+        and also interact with those commenters
+        """
+
+        message = "Starting to interact by comments.."
+        highlight_print(self.username, message, "feature", "info", self.logger)
+
+        if not isinstance(usernames, list):
+            usernames = [usernames]
+
+        if media not in ["Photo", "Video", None]:
+            self.logger.warning("Unkown media type- '{}' set at"
+                                " Interact-By-Comments!\t~treating as any.."
+                                .format(media))
+            media = None
+
+        # hold the current global values for differentiating at the end
+        liked_init = self.liked_img
+        already_liked_init = self.already_liked
+        liked_comments_init = self.liked_comments
+        commented_init = self.commented
+        replied_to_comments_init = self.replied_to_comments
+        followed_init = self.followed
+        already_followed_init = self.already_followed
+        inap_img_init = self.inap_img
+        not_valid_users_init = self.not_valid_users
+
+        overall_posts_count = 0
+        self.quotient_breach = False
+        like_failures_tracker = {"consequent": {"post_likes": 0,
+                                                "comment_likes": 0},
+                                 "limit": {"post_likes": 5,
+                                           "comment_likes": 10}}
+
+        leave_msg = "\t~leaving Interact-By-Comments activity\n"
+
+        # start the interaction!
+        for s, username in enumerate(usernames):
+            if self.quotient_breach:
+                break
+
+            message = "User: [{}/{}]".format(s + 1, len(usernames))
+            highlight_print(
+                self.username, message, "user iteration", "info", self.logger)
+
+            if username != self.username:
+                validation, details = self.validate_user_call(username)
+                if validation is not True:
+                    self.logger.info("--> Not a valid user: {}"
+                                     .format(details))
+                    self.not_valid_users += 1
+                    continue
+
+            per_user_liked_comments = 0
+            per_user_replied_to_comments = 0
+            per_user_used_replies = []
+
+            try:
+                links = get_links_for_username(self.browser,
+                                               self.username,
+                                               username,
+                                               posts_amount,
+                                               self.logger,
+                                               self.logfolder,
+                                               randomize,
+                                               media)
+            except NoSuchElementException:
+                self.logger.error("Element not found, skipping this user.")
+                continue
+
+            if links is False:
+                continue
+
+            else:
+                if randomize:
+                    random.shuffle(links)
+                links = links[:posts_amount]
+                overall_posts_count += len(links)
+
+            for i, link in enumerate(links):
+                if self.quotient_breach:
+                    break
+
+                elif (self.jumps["consequent"]["comments"]
+                      >= self.jumps["limit"]["comments"]):
+                    self.logger.warning(
+                        "--> Comment quotient reached its peak!{}"
+                        .format(leave_msg))
+                    self.quotient_breach = True
+                    # reset jump counter after a breach report
+                    self.jumps["consequent"]["comments"] = 0
+                    break
+
+                elif (like_failures_tracker["consequent"]["post_likes"]
+                      >= like_failures_tracker["limit"]["post_likes"]):
+                    self.logger.warning(
+                        "--> Too many failures to like posts!{}"
+                        .format(leave_msg))
+                    # this example shows helpful usage of
+                    # quotient breach outside QS needs..
+                    self.quotient_breach = True
+                    break
+
+                message = "Post: [{}/{}]".format(i + 1, len(links))
+                highlight_print(self.username, message, "post iteration",
+                                "info", self.logger)
+
+                post_description = get_link_description(self.browser, link, self.logger)
+
+                # get comments (if any)
+                comment_data = get_poster_comments_on_post(self.browser,
+                                                    username,
+                                                    link,
+                                                    self.logger)
+
+                # Add post description to full text of post
+                post_full_text = post_description
+
+                # Add all comments in full text of post, if exists
+                if comment_data:
+                    for commenter, comment in comment_data:
+                        post_full_text = post_full_text + ' ' + comment
+
+                # Filter only tags in full text
+                # Filter with regex and join back
+                if re.findall('#([a-zA-Z]+)', post_full_text):
+                    post_full_text = '#' + ' #'.join(re.findall('#([a-zA-Z]+)', post_full_text))
+                else:
+                    # Now hashtags in post
+                    post_full_text = None
+
+                if not post_full_text:
+                    self.logger.info("No tags in post.\n")
+                else:
+                    self.logger.info("Full tags text:{}.\n".format(post_full_text))
+                    
 
     def is_mandatory_character(self, uchr):
         if self.aborting:

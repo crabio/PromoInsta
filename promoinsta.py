@@ -16,11 +16,14 @@ with smart_run(session):
     # Stage 2 - work with competitor followers
     # session.set_do_like(enabled=True, percentage=100)
     # session.set_locations(['Moscow', 'Moscow, Russia'])
-    session.set_location_limits('Moscow', 10)
-    session.get_competitor_users_by_tags(['tatoo'], amount=10)
+    # session.set_location_limits('Moscow', 10)
+    # session.get_competitor_users_by_tags(['tatoo'], amount=10)
 
-    print(session.competitor_users, session.competitor_users_count)
-    
+    # print(session.competitor_users, session.competitor_users_count)
+
+    session.get_users_posts_tags('mankos.tattoo', posts_amount=2)
+
+
     # Выставляем границы для пользователей
     # session.set_relationship_bounds(enabled=True,
     #                                 potency_ratio=None,

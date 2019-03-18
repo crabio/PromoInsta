@@ -678,6 +678,69 @@ def check_link(browser, post_link, dont_like, mandatory_words,
     return True, user_name, is_video, 'None', "Success"
 
 
+def get_link_description(browser, post_link, logger):
+    """
+    Get post on link description
+    """
+
+    # Check URL of the webpage, if it already is post's page, then do not
+    # navigate to it again
+    web_address_navigator(browser, post_link)
+
+    """Check if the Post is Valid/Exists"""
+    try:
+        post_page = browser.execute_script(
+            "return window._sharedData.entry_data.PostPage")
+
+    except WebDriverException:  # handle the possible `entry_data` error
+        try:
+            browser.execute_script("location.reload()")
+            update_activity()
+
+            post_page = browser.execute_script(
+                "return window._sharedData.entry_data.PostPage")
+
+        except WebDriverException:
+            post_page = None
+
+    if post_page is None:
+        logger.warning(
+            'Unavailable Page: {}'.format(post_link.encode('utf-8')))
+        return False, None, None, 'Unavailable Page', "Failure"
+
+    """Gets the description of the post's link and checks for the dont_like
+    tags"""
+    graphql = 'graphql' in post_page[0]
+    if graphql:
+        media = post_page[0]['graphql']['shortcode_media']
+        user_name = media['owner']['username']
+        image_text = media['edge_media_to_caption']['edges']
+        image_text = image_text[0]['node']['text'] if image_text else None
+
+    else:
+        media = post_page[0]['media']
+        user_name = media['owner']['username']
+        image_text = media['caption']
+
+    """If the image still has no description gets the first comment"""
+    if image_text is None:
+        if graphql:
+            media_edge_string = get_media_edge_comment_string(media)
+            image_text = media[media_edge_string]['edges']
+            image_text = image_text[0]['node']['text'] if image_text else None
+
+        else:
+            image_text = media['comments']['nodes']
+            image_text = image_text[0]['text'] if image_text else None
+
+    if image_text is None:
+        image_text = "No description"
+
+    logger.info('Post description: {}'.format(image_text.encode('utf-8')))
+
+    return image_text
+
+
 def like_image(browser, username, blacklist, logger, logfolder):
     """Likes the browser opened image"""
     # check action availability
