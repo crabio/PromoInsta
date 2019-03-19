@@ -1170,7 +1170,7 @@ class InstaPy:
         self.min_posts = min_posts if enabled is True else None
         self.max_posts = max_posts if enabled is True else None
 
-    def validate_user_call(self, user_name):
+    def validate_user_call(self, user_name, ignore_own_account=False):
         """ Short call of validate_username() function """
         validation, details = validate_username(self.browser,
                                                 user_name,
@@ -1194,7 +1194,8 @@ class InstaPy:
                                                 self.skip_business_categories,
                                                 self.dont_skip_business_categories,
                                                 self.logger,
-                                                self.logfolder)
+                                                self.logfolder,
+                                                ignore_own_account)
         return validation, details
 
     def fetch_smart_comments(self, is_video, temp_comments):
@@ -5295,11 +5296,10 @@ class InstaPy:
                              randomize=False,
                              media=None):
         """
-         Like comments of people on posts, reply to them
-        and also interact with those commenters
+         Get users posts tags from description and poster comments
         """
 
-        message = "Starting to interact by comments.."
+        message = "Starting getting users posts tags.."
         highlight_print(self.username, message, "feature", "info", self.logger)
 
         if not isinstance(usernames, list):
@@ -5307,50 +5307,26 @@ class InstaPy:
 
         if media not in ["Photo", "Video", None]:
             self.logger.warning("Unkown media type- '{}' set at"
-                                " Interact-By-Comments!\t~treating as any.."
+                                " Getting users posts tags!\t~treating as any.."
                                 .format(media))
             media = None
 
-        # hold the current global values for differentiating at the end
-        liked_init = self.liked_img
-        already_liked_init = self.already_liked
-        liked_comments_init = self.liked_comments
-        commented_init = self.commented
-        replied_to_comments_init = self.replied_to_comments
-        followed_init = self.followed
-        already_followed_init = self.already_followed
-        inap_img_init = self.inap_img
-        not_valid_users_init = self.not_valid_users
-
-        overall_posts_count = 0
-        self.quotient_breach = False
-        like_failures_tracker = {"consequent": {"post_likes": 0,
-                                                "comment_likes": 0},
-                                 "limit": {"post_likes": 5,
-                                           "comment_likes": 10}}
-
-        leave_msg = "\t~leaving Interact-By-Comments activity\n"
+        # Init dict of each users tags
+        users_tags = {}
 
         # start the interaction!
         for s, username in enumerate(usernames):
-            if self.quotient_breach:
-                break
-
             message = "User: [{}/{}]".format(s + 1, len(usernames))
             highlight_print(
                 self.username, message, "user iteration", "info", self.logger)
 
-            if username != self.username:
-                validation, details = self.validate_user_call(username)
-                if validation is not True:
-                    self.logger.info("--> Not a valid user: {}"
-                                     .format(details))
-                    self.not_valid_users += 1
-                    continue
-
-            per_user_liked_comments = 0
-            per_user_replied_to_comments = 0
-            per_user_used_replies = []
+            # Validate username on posts count, follower count and etc.
+            validation, details = self.validate_user_call(username, True)
+            if validation is not True:
+                self.logger.info("--> Not a valid user: {}"
+                                    .format(details))
+                self.not_valid_users += 1
+                continue
 
             try:
                 links = get_links_for_username(self.browser,
@@ -5366,41 +5342,20 @@ class InstaPy:
                 continue
 
             if links is False:
+                self.logger.error("No links found, skipping this user.")
                 continue
 
             else:
                 if randomize:
                     random.shuffle(links)
                 links = links[:posts_amount]
-                overall_posts_count += len(links)
+
+            # Init user tags concat string from all posts
+            user_tags = ''
 
             for i, link in enumerate(links):
-                if self.quotient_breach:
-                    break
-
-                elif (self.jumps["consequent"]["comments"]
-                      >= self.jumps["limit"]["comments"]):
-                    self.logger.warning(
-                        "--> Comment quotient reached its peak!{}"
-                        .format(leave_msg))
-                    self.quotient_breach = True
-                    # reset jump counter after a breach report
-                    self.jumps["consequent"]["comments"] = 0
-                    break
-
-                elif (like_failures_tracker["consequent"]["post_likes"]
-                      >= like_failures_tracker["limit"]["post_likes"]):
-                    self.logger.warning(
-                        "--> Too many failures to like posts!{}"
-                        .format(leave_msg))
-                    # this example shows helpful usage of
-                    # quotient breach outside QS needs..
-                    self.quotient_breach = True
-                    break
-
                 message = "Post: [{}/{}]".format(i + 1, len(links))
-                highlight_print(self.username, message, "post iteration",
-                                "info", self.logger)
+                highlight_print(self.username, message, "post iteration", "info", self.logger)
 
                 post_description = get_link_description(self.browser, link, self.logger)
 
@@ -5419,9 +5374,9 @@ class InstaPy:
                         post_full_text = post_full_text + ' ' + comment
 
                 # Filter only tags in full text
-                # Filter with regex and join back
-                if re.findall('#([a-zA-Z]+)', post_full_text):
-                    post_full_text = '#' + ' #'.join(re.findall('#([a-zA-Z]+)', post_full_text))
+                # Filter with regex any letter in any language and join back
+                if re.findall('#(\w+)', post_full_text):
+                    post_full_text = '#' + ' #'.join(re.findall('#(\w+)', post_full_text))
                 else:
                     # Now hashtags in post
                     post_full_text = None
@@ -5430,7 +5385,22 @@ class InstaPy:
                     self.logger.info("No tags in post.\n")
                 else:
                     self.logger.info("Full tags text:{}.\n".format(post_full_text))
-                    
+                    # If user_tags is empty, don't add space
+                    if user_tags:
+                        user_tags += ' ' + post_full_text
+                    else:
+                        user_tags += post_full_text
+            
+            if not user_tags:
+                self.logger.info("No user_tags in user activity.\n")
+            else:
+                self.logger.info("Full user_tags text:{}.\n".format(user_tags))
+                # Add current user tags for dict, where store information about all users tags
+                users_tags[username] = user_tags
+            
+        return users_tags
+            
+
 
     def is_mandatory_character(self, uchr):
         if self.aborting:
