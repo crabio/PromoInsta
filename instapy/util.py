@@ -109,7 +109,8 @@ def validate_username(browser,
                       skip_business_categories,
                       dont_skip_business_categories,
                       logger,
-                      logfolder):
+                      logfolder,
+                      ignore_own_account=False):
     """Check if we can interact with the user"""
 
     # some features may not provide `username` and in those cases we will
@@ -148,9 +149,8 @@ def validate_username(browser,
         username = username_or_link  # if there is no `/` in
         # `username_or_link`, then it is a `username`
 
-    if username == own_username:
-        inap_msg = "---> Username '{}' is yours!\t~skipping user\n".format(
-            own_username)
+    if username == own_username and not ignore_own_account:
+        inap_msg = "---> Username '{}' is yours!\t~skipping user\n".format(own_username)
         return False, inap_msg
 
     if username in ignore_users:
