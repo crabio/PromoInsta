@@ -21,8 +21,21 @@ with smart_run(session):
 
     # print(session.competitor_users, session.competitor_users_count)
 
-    session.get_users_posts_tags('mankos.tattoo', posts_amount=2)
+    owner_tags = session.get_users_posts_tags('mankos.tattoo')['mankos.tattoo']
+    users_tags = session.get_users_posts_tags(['evgeny_kulik','belucchio','marily_demidova','4millieentertainment','vadimcracker','tattoo.inspiration.life'])
 
+    import textdistance
+
+    # Compare each user tags with owner
+    for user, tags in users_tags.items():
+        print('User {} tags: {}.'.format('mankos.tattoo', owner_tags))
+        print('Compression user {} tags: {}.'.format(user, tags))
+        print('Token based')
+        print('sorensen_dice.normalized_similarity {} with {}.'.format(textdistance.sorensen_dice.normalized_similarity(owner_tags, tags), user))
+        print('tversky.normalized_similarity {} with {}.'.format(textdistance.tversky.normalized_similarity(owner_tags, tags), user))
+        print('cosine.normalized_similarity {} with {}.'.format(textdistance.cosine.normalized_similarity(owner_tags, tags), user))
+        print('bag.normalized_similarity {} with {}.'.format(textdistance.bag.normalized_similarity(owner_tags, tags), user))
+        print('\n\n\n')
 
     # Выставляем границы для пользователей
     # session.set_relationship_bounds(enabled=True,
