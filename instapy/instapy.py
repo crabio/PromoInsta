@@ -5401,7 +5401,7 @@ class InstaPy:
         return user_tags
     
 
-    def get_similarity_user_tags(self,
+    def get_similarity_user_by_tags(self,
                              username=None,
                              posts_amount=10,
                              randomize=False,

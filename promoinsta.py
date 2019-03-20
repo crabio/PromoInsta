@@ -17,25 +17,18 @@ with smart_run(session):
     # session.set_do_like(enabled=True, percentage=100)
     # session.set_locations(['Moscow', 'Moscow, Russia'])
     # session.set_location_limits('Moscow', 10)
-    # session.get_competitor_users_by_tags(['tatoo'], amount=10)
+    session.get_competitor_users_by_tags(['tatoo'], amount=10)
 
     # print(session.competitor_users, session.competitor_users_count)
 
-    owner_tags = session.get_users_posts_tags('mankos.tattoo')['mankos.tattoo']
-    users_tags = session.get_users_posts_tags(['evgeny_kulik','belucchio','marily_demidova','4millieentertainment','vadimcracker','tattoo.inspiration.life'])
+    user = 'belucchio'
+    similarity_1 = session.get_similarity_user_by_tags(user)
+    user = 'mankos.tattoo'
+    similarity_2 = session.get_similarity_user_by_tags(user)
+    user = 'decembrenell12'
+    similarity_3 = session.get_similarity_user_by_tags(user)
 
-    import textdistance
-
-    # Compare each user tags with owner
-    for user, tags in users_tags.items():
-        print('User {} tags: {}.'.format('mankos.tattoo', owner_tags))
-        print('Compression user {} tags: {}.'.format(user, tags))
-        print('Token based')
-        print('sorensen_dice.normalized_similarity {} with {}.'.format(textdistance.sorensen_dice.normalized_similarity(owner_tags, tags), user))
-        print('tversky.normalized_similarity {} with {}.'.format(textdistance.tversky.normalized_similarity(owner_tags, tags), user))
-        print('cosine.normalized_similarity {} with {}.'.format(textdistance.cosine.normalized_similarity(owner_tags, tags), user))
-        print('bag.normalized_similarity {} with {}.'.format(textdistance.bag.normalized_similarity(owner_tags, tags), user))
-        print('\n\n\n')
+    print(similarity_1, similarity_2, similarity_3)
 
     # Выставляем границы для пользователей
     # session.set_relationship_bounds(enabled=True,
