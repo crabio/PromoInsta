@@ -5401,6 +5401,39 @@ class InstaPy:
         return user_tags
     
 
+    def get_similarity_user_tags(self,
+                             username=None,
+                             posts_amount=10,
+                             randomize=False,
+                             media=None):
+        """
+         Compare user posts tags with own user tags
+        """
+
+        # Check if it is your account
+        if username == self.username:
+            self.logger.warning("---> Username '{}' is yours!\t~skipping user\n".format(self.username))
+            return None
+
+        try:
+            # Get user tags from nearest posts desc and comments
+            user_tags = self.get_user_posts_tags(username,
+                                                posts_amount,
+                                                randomize,
+                                                media)
+
+            # Calc distance beween tags text
+            similarity = textdistance.bag.normalized_similarity(self.user_tags, user_tags)
+
+            self.logger.warning('---> normalized_similarity {} with {}.'.format(similarity, username))
+        
+        except Exception:
+            self.logger.warning("Error in compare by tags.")
+            return None
+        
+        else:
+            return similarity
+
 
     def is_mandatory_character(self, uchr):
         if self.aborting:
