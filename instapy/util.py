@@ -2165,6 +2165,20 @@ def get_bounding_box(latitude_in_degrees, longitude_in_degrees, half_side_in_mil
 
     return bbox
 
+def tags_string_to_list(tags_str):
+        """
+        Convert string with hashtags to list of tags
+        """
+
+        return re.findall('#(\w+)', tags_str)
+
+def tags_list_to_string(tags_list):
+        """
+         Get users posts tags from description and poster comments
+        """
+
+        return '#' + ' #'.join(tags_list)
+
 
 class CustomizedArgumentParser(ArgumentParser):
     """
