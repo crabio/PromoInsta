@@ -263,6 +263,8 @@ class InstaPy:
         self.location_distance_unit = 'km' # Distance units in km/miles
         self.locations = []
 
+        self.user_tags = ''
+
         # use this variable to terminate the nested loops after quotient
         # reaches
         self.quotient_breach = False
@@ -420,6 +422,12 @@ class InstaPy:
             except Exception:
                 self.logger.warning(
                     'Unable to save account progress, skipping data update')
+            
+            # try to get user tags from last posts
+            try:
+                self.user_tags = self.get_user_posts_tags(self.username)
+            except Exception:
+                self.logger.warning('Unable to get user tags from last posts')
 
         self.followed_by = log_follower_num(self.browser,
                                             self.username,
@@ -5290,8 +5298,8 @@ class InstaPy:
             self.logger.info("\tInappropriate posts: {}".format(inap_img))
             self.logger.info("\tNot valid users: {}".format(not_valid_users))
 
-    def get_users_posts_tags(self,
-                             usernames=None,
+    def get_user_posts_tags(self,
+                             username=None,
                              posts_amount=10,
                              randomize=False,
                              media=None):
@@ -5302,9 +5310,6 @@ class InstaPy:
         message = "Starting getting users posts tags.."
         highlight_print(self.username, message, "feature", "info", self.logger)
 
-        if not isinstance(usernames, list):
-            usernames = [usernames]
-
         if media not in ["Photo", "Video", None]:
             self.logger.warning("Unkown media type- '{}' set at"
                                 " Getting users posts tags!\t~treating as any.."
@@ -5314,92 +5319,87 @@ class InstaPy:
         # Init dict of each users tags
         users_tags = {}
 
-        # start the interaction!
-        for s, username in enumerate(usernames):
-            message = "User: [{}/{}]".format(s + 1, len(usernames))
-            highlight_print(
-                self.username, message, "user iteration", "info", self.logger)
+        # Get user tags
+        highlight_print(
+            self.username, message, "user iteration", "info", self.logger)
 
-            # Validate username on posts count, follower count and etc.
-            validation, details = self.validate_user_call(username, True)
-            if validation is not True:
-                self.logger.info("--> Not a valid user: {}"
-                                    .format(details))
-                self.not_valid_users += 1
-                continue
+        # Validate username on posts count, follower count and etc.
+        validation, details = self.validate_user_call(username, True)
+        if validation is not True:
+            self.logger.info("--> Not a valid user: {}"
+                                .format(details))
+            self.not_valid_users += 1
 
-            try:
-                links = get_links_for_username(self.browser,
-                                               self.username,
-                                               username,
-                                               posts_amount,
-                                               self.logger,
-                                               self.logfolder,
-                                               randomize,
-                                               media)
-            except NoSuchElementException:
-                self.logger.error("Element not found, skipping this user.")
-                continue
+        try:
+            links = get_links_for_username(self.browser,
+                                            self.username,
+                                            username,
+                                            posts_amount,
+                                            self.logger,
+                                            self.logfolder,
+                                            randomize,
+                                            media)
+        except NoSuchElementException:
+            self.logger.error("Element not found, skipping this user.")
+            return None
 
-            if links is False:
-                self.logger.error("No links found, skipping this user.")
-                continue
+        if links is False:
+            self.logger.error("No links found, skipping this user.")
+            return None
 
+        else:
+            if randomize:
+                random.shuffle(links)
+            links = links[:posts_amount]
+
+        # Init user tags concat string from all posts
+        user_tags = ''
+
+        for i, link in enumerate(links):
+            message = "Post: [{}/{}]".format(i + 1, len(links))
+            highlight_print(self.username, message, "post iteration", "info", self.logger)
+
+            post_description = get_link_description(self.browser, link, self.logger)
+
+            # get comments (if any)
+            comment_data = get_poster_comments_on_post(self.browser,
+                                                username,
+                                                link,
+                                                self.logger)
+
+            # Add post description to full text of post
+            post_full_text = post_description
+
+            # Add all comments in full text of post, if exists
+            if comment_data:
+                for commenter, comment in comment_data:
+                    post_full_text = post_full_text + ' ' + comment
+
+            # Filter only tags in full text
+            # Filter with regex any letter in any language and join back
+            if re.findall('#(\w+)', post_full_text):
+                post_full_text = '#' + ' #'.join(re.findall('#(\w+)', post_full_text))
             else:
-                if randomize:
-                    random.shuffle(links)
-                links = links[:posts_amount]
+                # Now hashtags in post
+                post_full_text = None
 
-            # Init user tags concat string from all posts
-            user_tags = ''
-
-            for i, link in enumerate(links):
-                message = "Post: [{}/{}]".format(i + 1, len(links))
-                highlight_print(self.username, message, "post iteration", "info", self.logger)
-
-                post_description = get_link_description(self.browser, link, self.logger)
-
-                # get comments (if any)
-                comment_data = get_poster_comments_on_post(self.browser,
-                                                    username,
-                                                    link,
-                                                    self.logger)
-
-                # Add post description to full text of post
-                post_full_text = post_description
-
-                # Add all comments in full text of post, if exists
-                if comment_data:
-                    for commenter, comment in comment_data:
-                        post_full_text = post_full_text + ' ' + comment
-
-                # Filter only tags in full text
-                # Filter with regex any letter in any language and join back
-                if re.findall('#(\w+)', post_full_text):
-                    post_full_text = '#' + ' #'.join(re.findall('#(\w+)', post_full_text))
-                else:
-                    # Now hashtags in post
-                    post_full_text = None
-
-                if not post_full_text:
-                    self.logger.info("No tags in post.\n")
-                else:
-                    self.logger.info("Full tags text:{}.\n".format(post_full_text))
-                    # If user_tags is empty, don't add space
-                    if user_tags:
-                        user_tags += ' ' + post_full_text
-                    else:
-                        user_tags += post_full_text
-            
-            if not user_tags:
-                self.logger.info("No user_tags in user activity.\n")
+            if not post_full_text:
+                self.logger.info("No tags in post.\n")
             else:
-                self.logger.info("Full user_tags text:{}.\n".format(user_tags))
-                # Add current user tags for dict, where store information about all users tags
-                users_tags[username] = user_tags
+                self.logger.info("Full tags text:{}.\n".format(post_full_text))
+                # If user_tags is empty, don't add space
+                if user_tags:
+                    user_tags += ' ' + post_full_text
+                else:
+                    user_tags += post_full_text
+        
+        if not user_tags:
+            self.logger.info("No user_tags in user activity.\n")
+        else:
+            self.logger.info("Full user_tags text:{}.\n".format(user_tags))
             
-        return users_tags
-            
+        return user_tags
+    
 
 
     def is_mandatory_character(self, uchr):
