@@ -54,6 +54,8 @@ from .util import save_account_progress
 from .util import parse_cli_args
 from .util import get_cord_location
 from .util import get_bounding_box
+from .util import tags_string_to_list
+from .util import tags_list_to_string
 from .unfollow_util import get_given_user_followers
 from .unfollow_util import get_given_user_following
 from .unfollow_util import unfollow
@@ -261,9 +263,9 @@ class InstaPy:
         self.location = ''
         self.location_max_distance = 0
         self.location_distance_unit = 'km' # Distance units in km/miles
-        self.locations = []
 
         self.user_tags = ''
+        self.competitor_similarity_threshold = 0.5
 
         # use this variable to terminate the nested loops after quotient
         # reaches
@@ -1279,6 +1281,11 @@ class InstaPy:
         self.location = location
         self.location_max_distance = max_distance
         self.location_distance_unit = distance_unit
+
+
+    # Set user account competitor similarity threshold for detect competitors on tags similarity
+    def set_competitor_similarity_threshold(self, threshold):
+        self.competitor_similarity_threshold = threshold
 
     def set_simulation(self, enabled=True, percentage=100):
         """ Sets aside simulation parameters """
@@ -4298,20 +4305,20 @@ class InstaPy:
                 self.logger.info(link)
 
                 try:
-                    # Check post characteristics like likes count, location and etc.
+                    # Check post characteristics on likes count, location and etc.
                     approved, user_name, is_video, reason, scope = (
                         check_link(self.browser,
                                 link,
                                 self.dont_like,
-                                self.mandatory_words,
-                                self.mandatory_language,
-                                self.is_mandatory_character,
-                                self.mandatory_character,
-                                self.check_character_set,
+                                None, # self.mandatory_words,
+                                None, # self.mandatory_language,
+                                None, # self.is_mandatory_character,
+                                None, # self.mandatory_character,
+                                None, # self.check_character_set,
                                 self.ignore_if_contains,
-                                self.location,
-                                self.location_max_distance,
-                                self.location_distance_unit,
+                                None, # self.location,
+                                None, # self.location_max_distance,
+                                None, # self.location_distance_unit,
                                 self.logger)
                     )
                     
@@ -4324,10 +4331,19 @@ class InstaPy:
                             not_valid_users += 1
                             continue
                         else:
-                            # Add username to list
-                            competitor_users_count += 1
-                            self.competitor_users.append(user_name)
-                            self.logger.info('--> User {} added into list'.format(user_name))
+                            # Calc similarity coeff on users posts tags
+                            similarity = self.get_similarity_user_by_tags(user_name)
+
+                            # Check similarity threshold
+                            if similarity > self.competitor_similarity_threshold:
+                                # Add username to list
+                                competitor_users_count += 1
+                                self.competitor_users.append(user_name)
+                                self.logger.info('--> User {} added into list'.format(user_name))
+                            else:
+                                not_valid_users += 1
+                                self.logger.info('--> User {} ignored, similarity {} not bigger than {}'.format(user_name, similarity, self.competitor_similarity_threshold))
+
                     else:
                         self.logger.info('--> User not added into list: {}'.format(reason))
                         inap_img += 1
@@ -5377,8 +5393,8 @@ class InstaPy:
 
             # Filter only tags in full text
             # Filter with regex any letter in any language and join back
-            if re.findall('#(\w+)', post_full_text):
-                post_full_text = '#' + ' #'.join(re.findall('#(\w+)', post_full_text))
+            if tags_string_to_list(post_full_text):
+                post_full_text = tags_list_to_string(tags_string_to_list(post_full_text))
             else:
                 # Now hashtags in post
                 post_full_text = None
@@ -5399,7 +5415,7 @@ class InstaPy:
             self.logger.info("Full user_tags text:{}.\n".format(user_tags))
             
         return user_tags
-    
+
 
     def get_similarity_user_by_tags(self,
                              username=None,

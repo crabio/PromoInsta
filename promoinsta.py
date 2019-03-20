@@ -1,8 +1,10 @@
 from instapy import InstaPy
-from instapy.util import smart_run
+from instapy.util import smart_run, tags_string_to_list
 
-insta_username = 'drawwer'
-insta_password = 'warandpiece'
+# insta_username = 'drawwer'
+# insta_password = 'warandpiece'
+insta_username='mankos.tattoo'
+insta_password='10011964A'
 
 insta_tags = ['']
 
@@ -17,19 +19,16 @@ with smart_run(session):
     # session.set_do_like(enabled=True, percentage=100)
     # session.set_locations(['Moscow', 'Moscow, Russia'])
     # session.set_location_limits('Moscow', 10)
-    session.get_competitor_users_by_tags(['tatoo'], amount=10)
+
+
+    print(tags_string_to_list(session.user_tags))
+    print(tags_string_to_list(session.user_tags)[0])
+    print(tags_string_to_list(session.user_tags)[1])
+    # session.get_competitor_users_by_tags(tags_string_to_list(session.user_tags)[0], amount=10)
 
     # print(session.competitor_users, session.competitor_users_count)
 
-    user = 'belucchio'
-    similarity_1 = session.get_similarity_user_by_tags(user)
-    user = 'mankos.tattoo'
-    similarity_2 = session.get_similarity_user_by_tags(user)
-    user = 'decembrenell12'
-    similarity_3 = session.get_similarity_user_by_tags(user)
-
-    print(similarity_1, similarity_2, similarity_3)
-
+    
     # Выставляем границы для пользователей
     # session.set_relationship_bounds(enabled=True,
     #                                 potency_ratio=None,
