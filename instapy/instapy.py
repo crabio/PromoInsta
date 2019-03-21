@@ -4336,15 +4336,17 @@ class InstaPy:
                             # Calc similarity coeff on users posts tags
                             similarity = self.get_similarity_user_by_tags(user_name)
 
-                            # Check similarity threshold
-                            if similarity > self.competitor_similarity_threshold:
-                                # Add username to list
-                                competitor_users_count += 1
-                                self.competitor_users.append(user_name)
-                                self.logger.info('--> User {} added into list'.format(user_name))
-                            else:
-                                not_valid_users += 1
-                                self.logger.info('--> User {} ignored, similarity {} not bigger than {}'.format(user_name, similarity, self.competitor_similarity_threshold))
+                            self.competitor_users.append({user_name: similarity})
+
+                            # # Check similarity threshold
+                            # if similarity > self.competitor_similarity_threshold:
+                            #     # Add username to list
+                            #     competitor_users_count += 1
+                            #     self.competitor_users.append({user_name: similarity})
+                            #     self.logger.info('--> User {} added into list'.format(user_name))
+                            # else:
+                            #     not_valid_users += 1
+                            #     self.logger.info('--> User {} ignored, similarity {} not bigger than {}'.format(user_name, similarity, self.competitor_similarity_threshold))
 
                     else:
                         self.logger.info('--> User not added into list: {}'.format(reason))
@@ -5316,6 +5318,7 @@ class InstaPy:
             self.logger.info("\tInappropriate posts: {}".format(inap_img))
             self.logger.info("\tNot valid users: {}".format(not_valid_users))
 
+    
     def get_user_posts_tags(self,
                              username=None,
                              posts_amount=10,
@@ -5333,9 +5336,6 @@ class InstaPy:
                                 " Getting users posts tags!\t~treating as any.."
                                 .format(media))
             media = None
-
-        # Init dict of each users tags
-        users_tags = {}
 
         # Get user tags
         highlight_print(
@@ -5416,7 +5416,7 @@ class InstaPy:
         else:
             self.logger.info("Full user_tags text:{}.\n".format(user_tags))
             
-        return tags_string_to_list(user_tags)
+        return user_tags
 
 
     def get_similarity_user_by_tags(self,

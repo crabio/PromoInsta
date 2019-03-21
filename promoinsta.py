@@ -1,5 +1,8 @@
 from instapy import InstaPy
-from instapy.util import smart_run, tags_string_to_list
+from instapy.util import smart_run
+from collections import Counter
+
+from instapy.util import tags_string_to_list, tags_list_to_string
 
 # insta_username = 'drawwer'
 # insta_password = 'warandpiece'
@@ -20,13 +23,16 @@ with smart_run(session):
     # session.set_locations(['Moscow', 'Moscow, Russia'])
     # session.set_location_limits('Moscow', 10)
 
+    print(session.user_tags)
 
-    print(tags_string_to_list(session.user_tags))
-    print(tags_string_to_list(session.user_tags)[0])
-    print(tags_string_to_list(session.user_tags)[1])
-    # session.get_competitor_users_by_tags(tags_string_to_list(session.user_tags)[0], amount=10)
+    tags_counter = Counter(tags_string_to_list(session.user_tags))
+    most_common_tags = tags_counter.most_common(1)
+    most_common_list = [key for (key, count) in most_common_tags]
 
-    # print(session.competitor_users, session.competitor_users_count)
+    print(most_common_list)
+    session.get_competitor_users_by_tags(['татумосква'], amount=30)
+
+    print(session.competitor_users)
 
     
     # Выставляем границы для пользователей
