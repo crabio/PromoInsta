@@ -45,6 +45,23 @@ tags = get_tags(self.browser, url)
 2. Прогон через анализатор текста для сравнения с текстом пользователя
 3. Если схожесть больше порога, то пользователь является предполагаемым конкурентом. Сохраняем в список конкурентов.
 
+Код оценки схожести:
+```python
+import textdistance
+
+text_1 = 'tag1 ' * 10 + 'tag2 ' * 10 + 'tag3 ' * 10
+text_2 = 'tag1 ' * 1 + 'tag2 ' * 1
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+tfidf_vectorizer = TfidfVectorizer()
+tfidf_matrix = tfidf_vectorizer.fit_transform((text_1, text_2))
+result_cos = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix)
+print(result_cos[0][1])
+```
+
 
 ### Работа с местоположениями.
 
