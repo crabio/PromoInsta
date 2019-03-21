@@ -1,24 +1,26 @@
 """OS Modules environ method to get the setup vars from the Environment"""
 # import built-in & third-party modules
 import time
-from datetime import datetime, timedelta
-from math import ceil
 import random
-from sys import platform
-from platform import python_version
 import os
 import csv
 import json
 import requests
+import logging
+import unicodedata
+import re
+
+from datetime import datetime, timedelta
+from math import ceil
+from sys import platform
+from platform import python_version
 from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
 from pyvirtualdisplay import Display
-import logging
 from contextlib import contextmanager
 from copy import deepcopy
-import unicodedata
-import re
-import textdistance
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # import InstaPy modules
 from .clarifai_util import check_image
@@ -5414,7 +5416,7 @@ class InstaPy:
         else:
             self.logger.info("Full user_tags text:{}.\n".format(user_tags))
             
-        return user_tags
+        return tags_string_to_list(user_tags)
 
 
     def get_similarity_user_by_tags(self,
@@ -5438,8 +5440,13 @@ class InstaPy:
                                                 randomize,
                                                 media)
 
-            # Calc distance beween tags text
-            similarity = textdistance.bag.normalized_similarity(self.user_tags, user_tags)
+            # Calc ышьшдфкшен beеween tags list text
+            tfidf_vectorizer = TfidfVectorizer()
+            tfidf_matrix = tfidf_vectorizer.fit_transform((self.user_tags, user_tags))
+            result_cos = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix)
+
+            # Get similarity from matrix
+            similarity = result_cos[0][1]
 
             self.logger.warning('---> normalized_similarity {} with {}.'.format(similarity, username))
         
