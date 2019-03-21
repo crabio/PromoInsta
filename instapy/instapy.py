@@ -206,7 +206,7 @@ class InstaPy:
         self.mandatory_words = []
         self.ignore_if_contains = []
         self.ignore_users = []
-        self.competitor_users = []
+        self.competitor_users = {}
 
         self.user_interact_amount = 0
         self.user_interact_media = None
@@ -4276,7 +4276,7 @@ class InstaPy:
         not_valid_users = 0
 
         # Reset competitors users list before start
-        self.competitor_users = []
+        self.competitor_users = {}
 
         # deletes white spaces in tags
         tags = [tag.strip() for tag in tags]
@@ -4336,7 +4336,7 @@ class InstaPy:
                             # Calc similarity coeff on users posts tags
                             similarity = self.get_similarity_user_by_tags(user_name)
 
-                            self.competitor_users.append({user_name: similarity})
+                            self.competitor_users[user_name] = similarity
 
                             # # Check similarity threshold
                             # if similarity > self.competitor_similarity_threshold:

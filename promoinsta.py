@@ -26,13 +26,25 @@ with smart_run(session):
     print(session.user_tags)
 
     tags_counter = Counter(tags_string_to_list(session.user_tags))
-    most_common_tags = tags_counter.most_common(1)
+    most_common_tags = tags_counter.most_common(10)
     most_common_list = [key for (key, count) in most_common_tags]
 
     print(most_common_list)
-    session.get_competitor_users_by_tags(['татумосква'], amount=30)
+    session.get_competitor_users_by_tags(most_common_list, amount=50)
 
+    print('Competitor users')
     print(session.competitor_users)
+
+    competitor_users_counter = Counter(session.competitor_users)
+    print('Most common')
+    print(competitor_users_counter.most_common(10))
+
+    # import pickle
+
+    # pickle_out = open("competitor_users.pickle","wb")
+    # pickle.dump(session.competitor_users, pickle_out)
+    # pickle_out.close()
+
 
     
     # Выставляем границы для пользователей
