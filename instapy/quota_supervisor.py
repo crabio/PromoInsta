@@ -4,7 +4,6 @@ from datetime import time, timedelta, date, datetime
 import random
 from sys import platform
 import sqlite3
-from plyer import notification
 from pkg_resources import resource_filename as get_pkg_resource_path
 
 from .time_util import sleep_actual
@@ -273,25 +272,6 @@ def toast_notification(notify, alert, job, interval):
                 "chill again wakey ;)"
                 if alert == "wakeup" else
                 "D\'oh! {} finished {} quotient!\t~exiting ~,~")
-
-        try:
-            notification.notify(
-                title="Quota Supervisor",
-                message=expr.format(label, interval),
-                app_name="InstaPy",
-                app_icon=icons[alert],
-                timeout=delay,
-                ticker="To switch supervising methods, please review "
-                       "quickstart script")
-
-        except Exception:
-            # TypeError: out of 'plyer' bug in python 2 - INNER EXCEPTION
-            # NotImplementedError: when 'plyer' is not supported
-            # DBusException: dbus-display issue on linux boxes
-
-            # turn off toast notification for the rest of the session
-            configuration.update(nofity=False)
-
 
 def get_icons():
     """ Return the locations of icons according to the operating system """
