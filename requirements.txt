@@ -1,0 +1,6 @@
+selenium
+pyvirtualdisplay
+clarifai
+emoji
+regex
+instapy_chromedriver
