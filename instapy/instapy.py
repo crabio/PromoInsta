@@ -429,7 +429,7 @@ class InstaPy:
             
             # try to get user tags from last posts
             try:
-                self.user_tags = self.get_user_posts_tags(self.username)
+                self.user_tags = self.get_user_posts_tags(self.username, extend=True)
             except Exception:
                 self.logger.warning('Unable to get user tags from last posts')
 
@@ -5318,12 +5318,54 @@ class InstaPy:
             self.logger.info("\tInappropriate posts: {}".format(inap_img))
             self.logger.info("\tNot valid users: {}".format(not_valid_users))
 
+    # Function for calc percentage of overlap of two lists
+    def calc_overlap_percentage(tags_A, tags_B):
+        setA = set(tags_A)
+        setB = set(tags_B)
+
+        return float(len(setA & setB)) / len(setA)
+
+    # Get similar hashtags from displaypurposes.com by tags list
+    # sort can be: 'rank'|'relevance'
+    def get_similar_hashtag(self, tags=None, limit=None, sort='relevance'):
+        """Generate smart hashtags based on https://displaypurposes.com/"""
+        """ranking, banned and spammy tags are filtered out."""
+
+        if tags is None:
+            self.logger.warning('Hash tags is none. Return')
+            return
+
+        hashtags = [] # Init list for saving
+
+        for tag in tags:
+            query = u'https://d212rkvo8t62el.cloudfront.net/tag/{}'.format(tag)
+            req = requests.get(query)
+            self.logger.info(query)
+
+            data = json.loads(req.text)
+
+            if data['tagExists'] is True:
+                # sort by sort field
+                ordered_tags = sorted(data['results'], key=lambda d: d[sort], reverse=True)
+                ordered_limited_tags = (ordered_tags[:limit])
+                for item in ordered_limited_tags:
+                    # add smart hashtag to like list
+                    hashtags.append(item['tag'])
+
+            else:
+                self.logger.info(u'Too few results for #{} tag'.format(tag))
+
+        self.logger.info(u'[smart hashtag generated: {}]'.format(hashtags))
+        # delete duplicated tags
+        return list(set(hashtags))
+
     
     def get_user_posts_tags(self,
                              username=None,
                              posts_amount=10,
                              randomize=False,
-                             media=None):
+                             media=None,
+                             extend=False):
         """
          Get users posts tags from description and poster comments
         """
@@ -5414,6 +5456,11 @@ class InstaPy:
         if not user_tags:
             self.logger.info("No user_tags in user activity.\n")
         else:
+            # If need extend with displaypurposes.com
+            if extend:
+                self.logger.info("Extend user_tags with similar tags.\n")
+                user_tags = self.get_similar_hashtag(user_tags)
+            
             self.logger.info("Full user_tags text:{}.\n".format(user_tags))
             
         return user_tags
